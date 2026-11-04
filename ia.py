@@ -80,12 +80,11 @@ header{visibility:hidden;} #MainMenu{visibility:hidden;}
 .ia-rep .meta b{color:#0f172a;}
 .ia-rep .concl{margin-top:10px;font-size:13.5px;color:#334155;background:#f6f9ff;border:1.5px solid #c7d6f0;padding:10px 14px;border-radius:12px;}
 .ia-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px;align-items:center;}
-.ia-scale span{font-size:11px;text-align:center;padding:9px 5px;border-radius:10px;background:#f1f4f9;color:#a3aec2;font-weight:600;line-height:1.2;opacity:.75;}
-.ia-scale span.on{color:#fff;font-weight:800;font-size:13.5px;padding:16px 8px;opacity:1;transform:scale(1.1);position:relative;z-index:2;
-  border:3px solid #fff;outline:3px solid var(--rc);box-shadow:0 8px 20px color-mix(in srgb,var(--rc) 50%,transparent);}
+.ia-scale span{font-size:11.5px;text-align:center;padding:11px 6px;border-radius:10px;background:#eef2f8;color:#6b7a92;font-weight:600;line-height:1.25;border:2px solid transparent;}
+.ia-scale span.on{color:#fff;font-weight:700;font-size:12px;padding:11px 6px;border:2px solid var(--rc);box-shadow:0 3px 8px color-mix(in srgb,var(--rc) 28%,transparent);}
 .ia-scale span.on.l1{--rc:#b91c1c;background:#b91c1c;} .ia-scale span.on.l2{--rc:#ea580c;background:#ea580c;} .ia-scale span.on.l3{--rc:#ca8a04;background:#ca8a04;}
 .ia-scale span.on.l4{--rc:#16a34a;background:#16a34a;} .ia-scale span.on.l5{--rc:#15803d;background:#15803d;}
-.ia-rating-head{display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:6px 14px;border-radius:99px;font-size:14px;font-weight:800;color:#fff;background:var(--rc);box-shadow:0 4px 12px color-mix(in srgb,var(--rc) 40%,transparent);}
+.ia-rating-head{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:3px 12px;border-radius:99px;font-size:12.5px;font-weight:700;color:var(--rc);background:color-mix(in srgb,var(--rc) 12%,#fff);border:1.5px solid color-mix(in srgb,var(--rc) 45%,#fff);}
 .ia-rep .lbl{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748b;}
 .ia-note{font-size:12.5px;color:#64748b;margin-top:8px;}
 
@@ -692,7 +691,7 @@ def _report_card(rep, fl):
     rc = {1: "#b91c1c", 2: "#ea580c", 3: "#ca8a04", 4: "#16a34a", 5: "#15803d"}.get(rep["rating_level"], "#64748b")
     head = f"<div class='ia-rating-head' style='--rc:{rc}'>★ {esc(rep['rating'])}</div>" if rep["rating_level"] else ""
     if rep["rating_level"]:
-        scale = head + "<div class='ia-scale' style='margin:16px 6px 10px'>" + "".join(f"<span class='{'on l' + str(i + 1) if i + 1 == rep['rating_level'] else ''}'>{esc(l)}</span>" for i, l in enumerate(labels)) + "</div>"
+        scale = head + "<div class='ia-scale' style='margin:10px 0 8px'>" + "".join(f"<span class='{'on l' + str(i + 1) if i + 1 == rep['rating_level'] else ''}'>{esc(l)}</span>" for i, l in enumerate(labels)) + "</div>"
     else:
         scale = "<div class='ia-scale' style='grid-template-columns:1fr'><span>Overall rating not stated in the report</span></div>"
     notes = f"<div class='ia-note'>ℹ️ {esc(rep['notes'])}</div>" if rep["notes"] else ""
