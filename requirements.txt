@@ -2,3 +2,5 @@ streamlit>=1.40
 pandas
 altair
 openpyxl
+streamlit-aggrid
+streamlit-quill

@@ -1,6 +1,8 @@
 """
 ia_core.py - pure helpers (no database, no Streamlit): statuses, dates, KPI maths, number formatting.
 """
+import html as _h
+import re
 from datetime import date, datetime, timedelta, timezone
 
 KIGALI = timezone(timedelta(hours=2))  # Rwanda: UTC+2, no daylight saving
@@ -203,3 +205,47 @@ def fmt_value(v, unit, full=False):
 
 def fmt_frw(v):
     return fmt_value(v, "Rwf")
+
+
+# ---------------------------------------------------------------------------------------------
+# Rich text (the Quill editor stores HTML; older/seed text is plain)
+# ---------------------------------------------------------------------------------------------
+_TAG = re.compile(r"<[^>]+>")
+_HTMLISH = re.compile(r"<\s*(p|br|ul|ol|li|strong|em|b|i|u|s|h[1-6]|div|span|a|blockquote)\b", re.I)
+
+
+def sanitize_html(s):
+    s = re.sub(r"(?is)<(script|style|iframe|object|embed)[^>]*>.*?</\1>", "", s or "")
+    s = re.sub(r"(?i)\son\w+\s*=\s*(\"[^\"]*\"|'[^']*'|[^\s>]+)", "", s)
+    return re.sub(r"(?i)javascript:", "", s)
+
+
+def plain(s):
+    """HTML (or plain text) -> readable plain text. Used for search, Excel export and change detection."""
+    if s is None:
+        return ""
+    s = str(s)
+    if not _HTMLISH.search(s):
+        return s.strip()
+    s = re.sub(r"(?i)<br\s*/?>", "\n", s)
+    s = re.sub(r"(?i)</(p|div|li|h[1-6]|blockquote)>", "\n", s)
+    s = re.sub(r"(?i)<li[^>]*>", "• ", s)
+    s = _h.unescape(_TAG.sub("", s)).replace("\xa0", " ")
+    return re.sub(r"\n{3,}", "\n\n", s).strip()
+
+
+def to_html(s):
+    """Plain text or HTML -> safe HTML for the editor and the table."""
+    s = "" if s is None else str(s)
+    if not s.strip():
+        return ""
+    if _HTMLISH.search(s):
+        return sanitize_html(s)
+    return "".join(f"<p>{_h.escape(p)}</p>" for p in s.split("\n") if p.strip())
+
+
+def clean_rich(s):
+    """Value coming back from the editor: '' if it is visually empty, else sanitised HTML."""
+    if s is None:
+        return ""
+    return sanitize_html(s) if plain(s) else ""

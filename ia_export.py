@@ -72,10 +72,10 @@ def build_workbook(findings, actions, kpis, history_fn, comments_by_finding, fy_
                 dl = core.days_left(r["due_date"], ref_today)
                 recs.append({
                     "Ref": f"{r['ref']}.{int(r['seq'])}", "Finding": r["finding_title"], "Area": r["area"], "Priority": r["priority"],
-                    "Recommended action": r["text"], "Owner": r["owner"], "Owner confirmed": "Yes" if r["owner_confirmed"] else "Proposed",
+                    "Recommended action": core.plain(r["text"]), "Owner": r["owner"], "Owner confirmed": "Yes" if r["owner_confirmed"] else "Proposed",
                     "Target date": core.fmt_date(r["due_date"], ""), "Status": r["status"], "% complete": r["pct"],
                     "Days overdue": (-dl if (dl is not None and dl < 0 and r["status"] in core.OPEN_STATUSES) else ""),
-                    "Closed on": core.fmt_date(r["closed_date"], ""), "Update / evidence": r["note"], "Last updated": r["updated_at"],
+                    "Closed on": core.fmt_date(r["closed_date"], ""), "Update / evidence": core.plain(r["note"]), "Last updated": r["updated_at"],
                 })
             name = f"{'Regional' if rkey == 'regional' else 'Central'} actions"
             pd.DataFrame(recs).to_excel(xw, sheet_name=name, index=False)
@@ -87,6 +87,8 @@ def build_workbook(findings, actions, kpis, history_fn, comments_by_finding, fy_
         fr["Report"] = fr["report"].map(lambda x: seed.REPORTS[x]["name"])
         fr = fr[["Report", "ref", "src_ref", "area", "title", "priority", "mgmt_position", "flagged_label", "timeline",
                  "observation", "criteria", "risk", "mgmt_comment", "notes"]]
+        for _c in ("title", "observation", "criteria", "risk", "mgmt_comment", "notes"):
+            fr[_c] = fr[_c].map(core.plain)
         fr.columns = ["Report", "Ref", "Report ref", "Area", "Finding", "Priority", "Management position", "Value flagged",
                       "Management timeline", "Observation", "Criteria", "Risk", "Management comment", "Notes"]
         fr.to_excel(xw, sheet_name="Findings", index=False)
